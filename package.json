@@ -1,6 +1,6 @@
 {
   "name": "@luosuqwq/dsh-diagram",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "Renders explanatory diagrams, web pages and annotated images to PNG, and shows them inline in answers.",
   "author": "LuoSu <2681153600@qq.com>",
   "keywords": [
