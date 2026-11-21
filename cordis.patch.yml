@@ -1,0 +1,5 @@
+# This bundle owns its composition row; the Plugins page switch toggles the
+# whole bundle, and the per-row switch writes `{ id, disabled }` here.
+- insert:
+    - id: dsh-diagram
+      name: dsh-diagram

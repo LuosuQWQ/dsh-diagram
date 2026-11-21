@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Diagram renderer",
+    "description": "Gives the model four tools: render an HTML snippet to PNG, screenshot a page or an element, annotate an existing image, and read the style guide. Images are written to `.dsh/diagram/` and shown inline in the answer. Needs Node 21+ and a local Chrome or Edge."
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "name": "dsh-diagram",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Renders explanatory diagrams, web pages and annotated images to PNG, and shows them inline in answers.",
+  "author": "LuoSu <2681153600@qq.com>",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "dsh-bundle",
+    "diagram",
+    "screenshot",
+    "image-annotation",
+    "png",
+    "chromium"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "lib/*.js",
+    "guides/*.md",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "engines": {
+    "node": ">=21"
+  },
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": ">=0.2.0-0"
+  }
+}

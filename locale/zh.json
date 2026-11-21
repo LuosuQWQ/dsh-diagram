@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "图示渲染",
+    "description": "给模型四个工具：把 HTML 片段渲染成 PNG、截取网页或某个元素、在已有图片上画框与箭头、读取样式指南。图片写入 `.dsh/diagram/` 并内联展示。需要 Node 21+ 与本机 Chrome 或 Edge。"
+  }
+}
