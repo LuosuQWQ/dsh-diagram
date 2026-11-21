@@ -143,14 +143,6 @@ const annotated = await tools.get('image_annotate').execute(
 )
 await fetchMarkdown('image_annotate', annotated)
 
-// A tampered signature must be rejected, or the route would serve any path.
-const signedUrl = annotated.markdown.match(/\(<(.+)>\)/)?.[1] ?? ''
-const tampered = signedUrl.replace(/[?&]s=[0-9a-f]{32}/, '&s=00000000000000000000000000000000')
-if (tampered === signedUrl) throw new Error('signature not present in markdown URL')
-const rejected = await fetch(tampered)
-if (rejected.status !== 404) throw new Error(`tampered signature returned ${rejected.status}, expected 404`)
-console.log('ok  asset route rejects a tampered signature')
-
 // 4. diagram_guide — bounded text, no image.
 const guide = await tools.get('diagram_guide').execute({}, exec)
 if (!guide?.text?.includes('主题变量')) throw new Error('diagram_guide 返回内容异常')

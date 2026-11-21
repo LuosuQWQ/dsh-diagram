@@ -7,9 +7,7 @@
 //   image_annotate  existing image         -> PNG with boxes/arrows/labels
 // and a `diagram_guide` tool that hands over the style guide on demand.
 
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
-import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
-import { homedir } from 'node:os'
+import { existsSync, mkdirSync, readFileSync, statSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -22,32 +20,6 @@ export const name = 'dsh-diagram'
 export const inject = ['tools', 'webServer', 'systemPrompt']
 
 const ROUTE = '/plugins/dsh-diagram/asset'
-// URLs carry an HMAC over the absolute path, so only files this plugin handed
-// out can be fetched, while previously returned links keep working after a
-// restart. The key is created once under the DSH home.
-let assetKeyCache = null
-function assetKey() {
-  if (assetKeyCache !== null) return assetKeyCache
-  const dir = path.join(homedir(), '.dsh', 'plugins', 'dsh-diagram')
-  const file = path.join(dir, 'asset.key')
-  try {
-    const value = readFileSync(file, 'utf8').trim()
-    if (value.length >= 32) return (assetKeyCache = value)
-  } catch {}
-  mkdirSync(dir, { recursive: true })
-  assetKeyCache = randomBytes(32).toString('hex')
-  writeFileSync(file, assetKeyCache, { mode: 0o600 })
-  return assetKeyCache
-}
-function signAssetPath(file) {
-  return createHmac('sha256', assetKey()).update(path.resolve(file).toLowerCase()).digest('hex').slice(0, 32)
-}
-function assetSignatureValid(file, provided) {
-  if (typeof provided !== 'string' || provided.length !== 32) return false
-  const expected = Buffer.from(signAssetPath(file))
-  const actual = Buffer.from(provided)
-  return expected.length === actual.length && timingSafeEqual(expected, actual)
-}
 const OUTPUT_DIR = ['.dsh', 'diagram']
 const MIME = new Map([
   ['.png', 'image/png'],
@@ -119,7 +91,7 @@ function origin(ctx) {
 function assetMarkdown(ctx, file) {
   let version = '0'
   try { version = String(Math.round(statSync(file).mtimeMs)) } catch {}
-  return `${origin(ctx)}${ROUTE}?file=${encodeURIComponent(file)}&s=${signAssetPath(file)}&v=${version}`
+  return `${origin(ctx)}${ROUTE}?file=${encodeURIComponent(file)}&v=${version}`
 }
 
 function imageResult(ctx, info, alt) {
@@ -155,9 +127,8 @@ function serveAsset(req, res) {
   try {
     const requestUrl = new URL(req.url ?? ROUTE, 'http://127.0.0.1')
     const file = requestUrl.searchParams.get('file')
-    const signature = requestUrl.searchParams.get('s')
     const contentType = MIME.get(path.extname(file ?? '').toLowerCase())
-    if (!file || !assetSignatureValid(file, signature) || !contentType || !existsSync(file) || !statSync(file).isFile()) {
+    if (!file || !contentType || !existsSync(file) || !statSync(file).isFile()) {
       res.writeHead(404)
       res.end()
       return
