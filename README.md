@@ -17,6 +17,10 @@ A DeepSeek Harness answer is text, but some explanations are really about a flow
 - **Inline in chat.** Every tool returns a `markdown` line served from the bundle's own asset route; paste it as-is and the picture appears in the answer.
 - **Real files on disk.** Each render is also saved as a file, by default under `.dsh/diagram/` in the session working directory.
 
+![Annotations drawn one by one](docs/preview/annotate.gif)
+
+One `image_annotate` call per step: the focal point, the gaze line, the body diagonal, negative space, then the warm/cool accent — all shapes, arrows and labels are drawn at render time.
+
 ## Example
 
 ![An annotated composition study](docs/preview/annotation.jpg)

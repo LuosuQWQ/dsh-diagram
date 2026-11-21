@@ -17,6 +17,10 @@ DeepSeek Harness 的回答本身是文字，但有些解释说的是流程、结
 - **直接内联。** 每个工具都返回一行 `markdown`，指向本 bundle 自己的取图路由；原样放进回答，图就出现在对话里。
 - **文件真实落盘。** 每次出图同时写一个文件，默认在会话工作目录的 `.dsh/diagram/` 下。
 
+![逐层添加的标注](docs/preview/annotate.gif)
+
+每一步一次 `image_annotate` 调用：焦点、视线、对角线、负空间，最后是冷暖对比——框、箭头、文字都是渲染时画上去的。
+
 ## 示例
 
 ![构图要点标注](docs/preview/annotation.jpg)
