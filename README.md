@@ -43,16 +43,18 @@ Install it from the checkout with the plugin manager:
 plugin_manager: { action: "install_bundle", target: "<path-to-checkout>" }
 ```
 
+dsh plugin --profile <profile> add @luosuqwq/dsh-diagram
+
 Or add it to a profile by hand — in the profile's `package.json`:
 
 ```json
 {
   "dependencies": {
-    "dsh-diagram": "link:<path-to-checkout>"
+    "@luosuqwq/dsh-diagram": "link:<path-to-checkout>"
   },
   "dsh": {
     "profile": {
-      "bundles": ["dsh-diagram"]
+      "bundles": ["@luosuqwq/dsh-diagram"]
     }
   }
 }

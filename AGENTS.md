@@ -11,6 +11,8 @@ A DSH bundle that adds four model-facing tools for turning HTML, a web page or a
 ## Install
 
 ```sh
+dsh plugin --profile <profile> add @luosuqwq/dsh-diagram
+
 git clone https://github.com/LuosuQWQ/dsh-diagram.git
 dsh plugin --profile <profile> add link:<absolute path>/dsh-diagram
 # restart DSH; settings shows nothing extra, the tools are simply mounted

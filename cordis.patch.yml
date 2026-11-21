@@ -2,4 +2,4 @@
 # whole bundle, and the per-row switch writes `{ id, disabled }` here.
 - insert:
     - id: dsh-diagram
-      name: dsh-diagram
+      name: @luosuqwq/dsh-diagram
