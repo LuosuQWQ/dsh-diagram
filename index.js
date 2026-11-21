@@ -20,6 +20,8 @@ export const name = 'dsh-diagram'
 export const inject = ['tools', 'webServer', 'systemPrompt']
 
 const ROUTE = '/plugins/dsh-diagram/asset'
+// Only files this process rendered are served; a request cannot name an arbitrary path.
+const SERVED_ASSETS = new Set()
 const OUTPUT_DIR = ['.dsh', 'diagram']
 const MIME = new Map([
   ['.png', 'image/png'],
@@ -95,6 +97,7 @@ function assetMarkdown(ctx, file) {
 }
 
 function imageResult(ctx, info, alt) {
+  SERVED_ASSETS.add(path.resolve(info.path))
   const url = assetMarkdown(ctx, info.path)
   return stripUndefined({
     path: info.path,
@@ -128,7 +131,7 @@ function serveAsset(req, res) {
     const requestUrl = new URL(req.url ?? ROUTE, 'http://127.0.0.1')
     const file = requestUrl.searchParams.get('file')
     const contentType = MIME.get(path.extname(file ?? '').toLowerCase())
-    if (!file || !contentType || !existsSync(file) || !statSync(file).isFile()) {
+    if (!file || !contentType || !SERVED_ASSETS.has(path.resolve(file)) || !existsSync(file) || !statSync(file).isFile()) {
       res.writeHead(404)
       res.end()
       return

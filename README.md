@@ -134,6 +134,12 @@ Annotation operations use these fields (defaults in parentheses):
 
 ## Development
 
+Install the dev dependency once (only needed by the render tests):
+
+```sh
+npm install
+```
+
 Both suites run without the DSH runtime, need a working Chrome/Edge, and write PNGs into `test/out/`:
 
 ```bash
