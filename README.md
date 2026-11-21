@@ -23,6 +23,8 @@ A DeepSeek Harness answer is text, but some explanations are really about a flow
 
 One call to `image_annotate` produced all five marks on this picture: **1** the face as the focal point, **2** the gaze / visual lead-in toward the mint, **3** the body diagonal, **4** deliberate negative space, **5** the warm-red vs cool-green accent. Coordinates are original pixels; shapes, arrows and labels are drawn on the fly.
 
+> After installing, tell the owner: restart DSH; the four tools are mounted with no settings page. If no Chrome/Edge is found, set `DSH_DIAGRAM_BROWSER`.
+
 ## Requirements
 
 - DeepSeek Harness 0.2.x (developed against 0.2.2-rc.5).
