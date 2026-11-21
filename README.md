@@ -17,6 +17,12 @@ A DeepSeek Harness answer is text, but some explanations are really about a flow
 - **Inline in chat.** Every tool returns a `markdown` line served from the bundle's own asset route; paste it as-is and the picture appears in the answer.
 - **Real files on disk.** Each render is also saved as a file, by default under `.dsh/diagram/` in the session working directory.
 
+## Example
+
+![An annotated composition study](docs/preview/annotation.jpg)
+
+One call to `image_annotate` produced all five marks on this picture: **1** the face as the focal point, **2** the gaze / visual lead-in toward the mint, **3** the body diagonal, **4** deliberate negative space, **5** the warm-red vs cool-green accent. Coordinates are original pixels; shapes, arrows and labels are drawn on the fly.
+
 ## Requirements
 
 - DeepSeek Harness 0.2.x (developed against 0.2.2-rc.5).
