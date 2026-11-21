@@ -6,6 +6,8 @@ English | [简体中文](README.zh-CN.md)
 
 A DeepSeek Harness answer is text, but some explanations are really about a flow, a structure, a comparison or "where exactly in this screenshot". This bundle gives the agent four tools that turn HTML, a web page or an existing image into a PNG file and inline it in the conversation. Rendering uses the Chrome or Edge already installed on the machine: no bundled browser, no npm packages, no external service.
 
+![dsh-diagram](docs/preview/hero.jpg)
+
 ## Features
 
 - **Diagrams from HTML.** `diagram_render` wraps a fragment in a shell with a CJK font stack, a dark or light theme and `.card` `.grid` `.arrow` `.pill` `table` utility classes, then crops to the content height and renders at 2× by default.

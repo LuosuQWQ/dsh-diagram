@@ -6,6 +6,8 @@
 
 DeepSeek Harness 的回答本身是文字，但有些解释说的是流程、结构、对比，或者「这一点在截图里的哪里」。这个 bundle 给模型四个工具，把 HTML、网页或已有图片变成 PNG，并内联到对话里。渲染直接用机器上已装的 Chrome 或 Edge：不带浏览器、不装 npm 包、不连外部服务。
 
+![dsh-diagram](docs/preview/hero.jpg)
+
 ## 功能
 
 - **用 HTML 画图。** `diagram_render` 把片段套进统一外壳：中文字体栈、深/浅主题，以及 `.card` `.grid` `.arrow` `.pill` `table` 等样式类；高度默认按内容裁剪，输出默认 2 倍图。

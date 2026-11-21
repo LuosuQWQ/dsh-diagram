@@ -35,7 +35,8 @@
     "README.md",
     "README.zh-CN.md",
     "LICENSE",
-    "package.json"
+    "package.json",
+    "AGENTS.md"
   ],
   "engines": {
     "node": ">=21"
@@ -48,5 +49,13 @@
   },
   "peerDependencies": {
     "@deepseek-ai/dsh-tools": ">=0.2.0-0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuosuQWQ/dsh-diagram.git"
+  },
+  "homepage": "https://github.com/LuosuQWQ/dsh-diagram#readme",
+  "bugs": {
+    "url": "https://github.com/LuosuQWQ/dsh-diagram/issues"
   }
 }
