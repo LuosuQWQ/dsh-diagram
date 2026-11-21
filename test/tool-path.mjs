@@ -54,7 +54,7 @@ const server = createServer((req, res) => {
   }
   route.handler(req, res)
 })
-await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
+await new Promise((resolve, reject) => server.listen(18787, '127.0.0.1', resolve).on('error', reject))
 origin = `http://127.0.0.1:${server.address().port}`
 
 const results = []
@@ -142,6 +142,14 @@ const annotated = await tools.get('image_annotate').execute(
   exec,
 )
 await fetchMarkdown('image_annotate', annotated)
+
+// A tampered signature must be rejected, or the route would serve any path.
+const signedUrl = annotated.markdown.match(/\(<(.+)>\)/)?.[1] ?? ''
+const tampered = signedUrl.replace(/[?&]s=[0-9a-f]{32}/, '&s=00000000000000000000000000000000')
+if (tampered === signedUrl) throw new Error('signature not present in markdown URL')
+const rejected = await fetch(tampered)
+if (rejected.status !== 404) throw new Error(`tampered signature returned ${rejected.status}, expected 404`)
+console.log('ok  asset route rejects a tampered signature')
 
 // 4. diagram_guide — bounded text, no image.
 const guide = await tools.get('diagram_guide').execute({}, exec)
