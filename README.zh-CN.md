@@ -1,6 +1,6 @@
 [English](README.md) | 简体中文
 
-# dsh-diagram
+# 大肥鱼画图
 
 > 在 DSH 的回答里直接生成图示、网页截图与标注图片，输出 PNG。
 

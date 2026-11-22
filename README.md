@@ -1,6 +1,6 @@
 English | [简体中文](README.zh-CN.md)
 
-# dsh-diagram
+# Big Fat Fish
 
 > Render diagrams, page screenshots and annotated images to PNG inside DSH answers.
 
