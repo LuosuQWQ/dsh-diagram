@@ -96,7 +96,7 @@ plugin_manager: { action: "install_bundle", target: "<path-to-checkout>" }
 }
 ```
 
-返回结果里有 `path`、`url`、`width`、`height`、`bytes` 和 `markdown`；`markdown` 指向 DSH 服务的 `/plugins/dsh-diagram/asset?file=...`，只要原样复制就能内联显示。
+返回结果里有 `path`、`url`、`width`、`height`、`bytes` 和 `markdown`。`markdown` 用的是 DSH 原生渲染的写法——`![alt](<百分号编码的绝对路径>)`，聊天客户端会把它重写成自己的 `/api/file?path=...` 鉴权路由，浏览器和桌面壳都能显示；原样复制这一行就能在回答里出图。`url` 是插件自己的 `/plugins/dsh-diagram/asset?file=...`，留给需要走 HTTP 取原始字节的场合（只答已认证的 DSH 客户端）。
 
 几个值得记住的默认值：`diagram_render` 宽度 1200、主题 `dark`、倍率 2（输出是画布的 2 倍像素）；`page_screenshot` 视口 1440×900、倍率 2、页面载入后额外等 400 ms；`image_annotate` 倍率 2。
 

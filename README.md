@@ -98,7 +98,7 @@ A minimal `diagram_render` call:
 }
 ```
 
-The result carries `path`, `url`, `width`, `height`, `bytes` and `markdown`; the Markdown link points at `/plugins/dsh-diagram/asset?file=...` on the DSH web server, so it renders inline as long as the value is copied unchanged.
+The result carries `path`, `url`, `width`, `height`, `bytes` and `markdown`. `markdown` uses the form DSH renders natively — `![alt](<percent-encoded absolute path>)` — which the chat client rewrites to its authenticated `/api/file?path=...` route, so it works in the browser and in the desktop shell alike; copy that line unchanged and the picture appears in the answer. `url` is the plugin's own `/plugins/dsh-diagram/asset?file=...` route, kept for anyone that wants the raw bytes over HTTP (it answers only an admitted DSH client).
 
 Defaults worth knowing: `diagram_render` uses width 1200, theme `dark` and scale 2 (output is twice the canvas size); `page_screenshot` uses a 1440×900 viewport, scale 2 and a 400 ms wait after load; `image_annotate` uses scale 2.
 

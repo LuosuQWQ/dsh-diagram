@@ -89,15 +89,26 @@ function assetMarkdown(file) {
   return `${ROUTE}?file=${encodeURIComponent(file)}&v=${version}`
 }
 
+/**
+ * 聊天里的图走 DSH 自己的通道：AssistantMarkdown 会把「百分号编码的绝对路径」
+ * 重写成 /api/file?path=...，那条路由挂在 connection.fetch 上、按会话鉴权。
+ * 插件自建的 /plugins/... 路由在桌面壳里是另一个源、拿不到会话 cookie，
+ * 用它做内联只会显示「图片无法预览」——所以 markdown 用原生写法，
+ * route 只留给需要直接取字节的外部消费者（例如复制 url 到别处）。
+ */
+function localImageMarkdown(file, alt) {
+  const cleanAlt = String(alt ?? '').replace(/[[\]]/g, '').replace(/\s+/g, ' ').trim()
+  return `![${cleanAlt || 'image'}](<${encodeURIComponent(path.resolve(file))}>)`
+}
+
 function imageResult(info, alt) {
-  const url = assetMarkdown(info.path)
   return stripUndefined({
     path: info.path,
-    url,
+    url: assetMarkdown(info.path),
     width: info.width,
     height: info.height,
     bytes: info.bytes,
-    markdown: `![${alt}](<${url}>)`,
+    markdown: localImageMarkdown(info.path, alt),
   })
 }
 

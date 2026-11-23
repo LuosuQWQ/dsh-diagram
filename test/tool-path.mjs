@@ -64,10 +64,13 @@ origin = `http://127.0.0.1:${server.address().port}`
 const results = []
 async function fetchMarkdown(label, value, minBytes = 8000) {
   if (!value?.markdown) throw new Error(`${label}: 没有返回 markdown`)
-  const url = value.markdown.match(/\(<(.+)>\)/)?.[1]
-  // 路由地址是页面相对的：Web 端直接命中同一个 Host，桌面壳转发时补 cookie。
-  if (!url || !url.startsWith('/plugins/')) throw new Error(`${label}: markdown 链接异常 ${value.markdown}`)
-  const response = await fetch(new URL(url, origin))
+  // 内联走 DSH 原生通道：markdown 是百分号编码的绝对路径，客户端会把它重写成
+  // /api/file?path=...（按会话鉴权）。插件路由只留给 url 字段。
+  const target = value.markdown.match(/^!\[[^\]]*\]\(<(.+)>\)$/)?.[1]
+  if (!target) throw new Error(`${label}: markdown 不是本地路径写法 ${value.markdown}`)
+  if (decodeURIComponent(target) !== value.path) throw new Error(`${label}: markdown 路径与 path 不一致 ${decodeURIComponent(target)}`)
+  if (!String(value.url ?? '').startsWith('/plugins/')) throw new Error(`${label}: url 异常 ${value.url}`)
+  const response = await fetch(new URL(value.url, origin))
   if (response.status !== 200) throw new Error(`${label}: 路由返回 ${response.status}`)
   if (response.headers.get('content-type') !== 'image/png') throw new Error(`${label}: content-type 不是 PNG`)
   const bytes = Buffer.from(await response.arrayBuffer())
@@ -154,7 +157,8 @@ if (!guide?.text?.includes('主题变量')) throw new Error('diagram_guide 返�
 console.log(`ok  diagram_guide  ${guide.text.length} 字符`)
 
 // 5. 准入：同一个图片地址，带跨站标记的请求必须被拒。
-const assetPath = new URL(diagram.markdown.match(/\(<(.+)>\)/)?.[1], origin).pathname + new URL(diagram.markdown.match(/\(<(.+)>\)/)?.[1], origin).search
+const assetUrl = new URL(diagram.url, origin)
+const assetPath = assetUrl.pathname + assetUrl.search
 const crossSite = await new Promise((resolve, reject) => {
   const req = request({
     host: '127.0.0.1',
