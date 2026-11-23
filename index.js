@@ -126,13 +126,16 @@ function imageRender(_args, value) {
 
 /**
  * 向 Host 的 connection 服务要一次准入判断：Host/Origin 围栏 + 已认证的会话。
- * 没有这个服务（例如无 HTTP 层的组合）时不拦，保持插件可用。
+ * 拿不到这个服务就一律拒绝（503）：宁可这条路不可用，也不能在服务缺席时
+ * 静默放行——那正好是这个洞原来的样子。
  */
 function requestRejection(ctx, req) {
+  const connection = ctx.get?.('connection')
+  if (typeof connection?.requestRejection !== 'function') return 503
   try {
-    return ctx.get?.('connection')?.requestRejection?.(req)
+    return connection.requestRejection(req)
   } catch {
-    return undefined
+    return 403
   }
 }
 
