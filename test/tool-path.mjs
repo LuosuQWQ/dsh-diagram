@@ -5,7 +5,7 @@
 //   node plugins/dsh-diagram/test/tool-path.mjs
 
 import { readFile, mkdir, stat } from 'node:fs/promises'
-import { createServer } from 'node:http'
+import { createServer, request } from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { apply } from '../index.js'
@@ -34,6 +34,10 @@ const ctx = {
     port: 0,
   },
   systemPrompt: { section: section => sections.push(section) },
+  // 只模拟本插件用到的那一条规则：跨站标记直接拒。真实实现还会验 Host 与签名 cookie。
+  get: (name) => (name === 'connection' ? {
+    requestRejection: (req) => (req.headers?.['sec-fetch-site'] === 'cross-site' ? 403 : undefined),
+  } : undefined),
 }
 
 apply(ctx)
@@ -61,8 +65,9 @@ const results = []
 async function fetchMarkdown(label, value, minBytes = 8000) {
   if (!value?.markdown) throw new Error(`${label}: 没有返回 markdown`)
   const url = value.markdown.match(/\(<(.+)>\)/)?.[1]
-  if (!url || !url.startsWith(origin)) throw new Error(`${label}: markdown 链接异常 ${value.markdown}`)
-  const response = await fetch(url)
+  // 路由地址是页面相对的：Web 端直接命中同一个 Host，桌面壳转发时补 cookie。
+  if (!url || !url.startsWith('/plugins/')) throw new Error(`${label}: markdown 链接异常 ${value.markdown}`)
+  const response = await fetch(new URL(url, origin))
   if (response.status !== 200) throw new Error(`${label}: 路由返回 ${response.status}`)
   if (response.headers.get('content-type') !== 'image/png') throw new Error(`${label}: content-type 不是 PNG`)
   const bytes = Buffer.from(await response.arrayBuffer())
@@ -147,6 +152,21 @@ await fetchMarkdown('image_annotate', annotated)
 const guide = await tools.get('diagram_guide').execute({}, exec)
 if (!guide?.text?.includes('主题变量')) throw new Error('diagram_guide 返回内容异常')
 console.log(`ok  diagram_guide  ${guide.text.length} 字符`)
+
+// 5. 准入：同一个图片地址，带跨站标记的请求必须被拒。
+const assetPath = new URL(diagram.markdown.match(/\(<(.+)>\)/)?.[1], origin).pathname + new URL(diagram.markdown.match(/\(<(.+)>\)/)?.[1], origin).search
+const crossSite = await new Promise((resolve, reject) => {
+  const req = request({
+    host: '127.0.0.1',
+    port: server.address().port,
+    path: assetPath,
+    headers: { 'sec-fetch-site': 'cross-site' },
+  }, res => { res.resume(); res.on('end', () => resolve(res.statusCode)) })
+  req.on('error', reject)
+  req.end()
+})
+if (crossSite !== 403) throw new Error(`跨站请求没有被拒绝：${crossSite}`)
+console.log('ok  准入  跨站请求被拒 403')
 
 server.close()
 

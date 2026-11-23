@@ -80,22 +80,17 @@ function resolveOut(raw, cwd, seed) {
   return path.join(dir, `${slugify(seed)}-${stamp()}.png`)
 }
 
-function origin(ctx) {
-  try {
-    return ctx.webServer.getOrigin()
-  } catch {
-    return `http://127.0.0.1:${ctx.webServer.port}`
-  }
-}
-
-function assetMarkdown(ctx, file) {
+// 资源地址保持页面相对：Web 端页面本来就由本 Host 提供，桌面壳把
+// `dsh-app://app/...` 转发到 Host 时会带上会话 cookie；写成绝对地址反而
+// 会被浏览器当成跨站请求，连 cookie 都不会带上。相对地址两边都成立。
+function assetMarkdown(file) {
   let version = '0'
   try { version = String(Math.round(statSync(file).mtimeMs)) } catch {}
-  return `${origin(ctx)}${ROUTE}?file=${encodeURIComponent(file)}&v=${version}`
+  return `${ROUTE}?file=${encodeURIComponent(file)}&v=${version}`
 }
 
-function imageResult(ctx, info, alt) {
-  const url = assetMarkdown(ctx, info.path)
+function imageResult(info, alt) {
+  const url = assetMarkdown(info.path)
   return stripUndefined({
     path: info.path,
     url,
@@ -118,7 +113,26 @@ function imageRender(_args, value) {
   ]
 }
 
-function serveAsset(req, res) {
+/**
+ * 向 Host 的 connection 服务要一次准入判断：Host/Origin 围栏 + 已认证的会话。
+ * 没有这个服务（例如无 HTTP 层的组合）时不拦，保持插件可用。
+ */
+function requestRejection(ctx, req) {
+  try {
+    return ctx.get?.('connection')?.requestRejection?.(req)
+  } catch {
+    return undefined
+  }
+}
+
+function serveAsset(ctx, req, res) {
+  // 图片路由同样要过准入：否则用户浏览器里任意网页都能借这个端口探本机文件。
+  const rejection = requestRejection(ctx, req)
+  if (rejection !== undefined) {
+    res.writeHead(rejection, { 'content-type': 'text/plain; charset=utf-8' })
+    res.end()
+    return
+  }
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405, { allow: 'GET, HEAD' })
     res.end()
@@ -190,7 +204,7 @@ function diagramRenderTool(ctx) {
         scale: clamp(args.scale, 2, 1, 3),
         outPath,
       })
-      return imageResult(ctx, info, args.title || '图示')
+      return imageResult(info, args.title || '图示')
     },
   })
 }
@@ -232,7 +246,7 @@ function pageScreenshotTool(ctx) {
           if (extra > 0) await wait(extra)
         },
       })
-      return imageResult(ctx, info, '截图')
+      return imageResult(info, '截图')
     },
   })
 }
@@ -310,7 +324,7 @@ function imageAnnotateTool(ctx) {
         scale: clamp(args.scale, 2, 1, 3),
         outPath,
       })
-      return imageResult(ctx, info, path.basename(imageFile, path.extname(imageFile)))
+      return imageResult(info, path.basename(imageFile, path.extname(imageFile)))
     },
   })
 }
@@ -340,7 +354,7 @@ function promptSection() {
 }
 
 export function apply(ctx) {
-  ctx.effect(() => ctx.webServer.register({ kind: 'exact', path: ROUTE, handler: serveAsset }), 'dsh-diagram: image route')
+  ctx.effect(() => ctx.webServer.register({ kind: 'exact', path: ROUTE, handler: (req, res) => serveAsset(ctx, req, res) }), 'dsh-diagram: image route')
   ctx.effect(() => ctx.tools.register(diagramRenderTool(ctx)), 'dsh-diagram: diagram_render')
   ctx.effect(() => ctx.tools.register(pageScreenshotTool(ctx)), 'dsh-diagram: page_screenshot')
   ctx.effect(() => ctx.tools.register(imageAnnotateTool(ctx)), 'dsh-diagram: image_annotate')

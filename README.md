@@ -121,7 +121,7 @@ Annotation operations use these fields (defaults in parentheses):
 - The browser is driven over the DevTools protocol on `--remote-debugging-pipe` (fd 3 and fd 4, NUL-separated JSON) instead of a TCP port, so proxy environment variables that intercept localhost connections cannot break it.
 - Content height is measured from the body subtree rather than `scrollHeight`, because both `scrollHeight` and `Page.getLayoutMetrics` refuse to report less than the viewport height.
 - `image_annotate` renders the source image in a page and draws an SVG overlay on top; `blur` regions re-draw the image inside a CSS-filtered box.
-- PNGs are written by the DSH server process and served by the bundle's own route (`GET`/`HEAD`, known image MIME types only, `cache-control: no-store`).
+- PNGs are written by the DSH server process and served by the bundle's own route (`GET`/`HEAD`, known image MIME types only, `cache-control: no-store`). The route runs the Host admission check first (`ctx.connection.requestRejection`), so it answers only an admitted DSH client and refuses a cross-site caller, and the Markdown link stays page-relative so both the web page and the desktop shell reach it through that same check.
 
 ## Limitations
 

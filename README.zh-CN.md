@@ -119,7 +119,7 @@ plugin_manager: { action: "install_bundle", target: "<path-to-checkout>" }
 - 浏览器走 DevTools 协议的 `--remote-debugging-pipe`（fd 3 写、fd 4 读，NUL 分隔的 JSON），不开 TCP 端口，所以拦截 localhost 的代理环境变量影响不到它。
 - 内容高度不是读 `scrollHeight`：`scrollHeight` 和 `Page.getLayoutMetrics` 都不会小于视口高度，所以改为量 body 子树里最靠下的底边。
 - `image_annotate` 先把原图放进一个页面，再在上面叠一层 SVG；`blur` 区域则是在被裁剪的盒子里用 CSS 滤镜重绘原图。
-- PNG 由 DSH 服务进程写盘，并由本 bundle 自己的路由提供（只接受 `GET`/`HEAD`、只发已知图片类型、`cache-control: no-store`）。
+- PNG 由 DSH 服务进程写盘，并由本 bundle 自己的路由提供（只接受 `GET`/`HEAD`、只发已知图片类型、`cache-control: no-store`）。路由先过 Host 的准入检查（`ctx.connection.requestRejection`）：只答已认证的 DSH 客户端，跨站调用方拿不到字节；Markdown 链接保持页面相对，Web 页面和桌面壳都走同一条检查。
 
 ## 已知限制
 
